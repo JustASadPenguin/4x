@@ -5,6 +5,8 @@ namespace Simple4X {
         public int q;
         public int r;
 
+        public const Axial Zero = new Axial(0, 0);
+
         public const Axial TopLeft = new Axial(0, -1);
         public const Axial TopRight = new Axial(1, -1);
         public const Axial Right = new Axial(1, 0);
