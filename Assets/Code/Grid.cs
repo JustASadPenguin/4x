@@ -117,7 +117,7 @@ namespace Simple4X
 
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
-                    SetTile(new Axial(q, r), Tile.Empty);
+                    this[q, r] = Tile.Empty;
                 }
             }
         }
