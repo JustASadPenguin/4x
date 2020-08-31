@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace Simple4X
@@ -123,38 +124,14 @@ namespace Simple4X
 
         private void Update() {
             if (Input.GetMouseButton(0)) {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Plane horizontalPlane = new Plane(Vector3.up, transform.position);
-
-                float distance = 0.0f;
-                if (horizontalPlane.Raycast(ray, out distance)) {
-                    Vector3 hitWorldPosition = ray.origin + ray.direction * distance;
-                    Vector3 hitLocalPosition = transform.InverseTransformPoint(hitWorldPosition);
-
-                    Debug.DrawRay(hitLocalPosition, Vector3.up, Color.red);
-                }
-            }
-            if (Input.GetMouseButtonDown(0)) {
-                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-                Plane horizontalPlane = new Plane(Vector3.up, transform.position);
-
-                float distance = 0.0f;
-                if (horizontalPlane.Raycast(ray, out distance)) {
-                    Vector3 hitWorldPosition = ray.origin + ray.direction * distance;
-                    Vector3 hitLocalPosition = transform.InverseTransformPoint(hitWorldPosition);
-
-                    Debug.DrawRay(hitLocalPosition, Vector3.up, Color.red);
-
-                    float q = (Mathf.Sqrt(3.0f) / 3.0f * hitLocalPosition.x - 1.0f / 3.0f * hitLocalPosition.z) / HexSize;
-                    float r = (2.0f / 3.0f * hitLocalPosition.z) / HexSize;
-                    Axial position = Axial.Round(q, r);
-
-                    Tile tile = GetTile(position);
-                    SetTile(position, tile == Tile.Empty ? Tile.Buildings : Tile.Empty);
+                Axial position;
+                if (RaycastMouse(out position)) {
+                    if (this[position] != Tile.Buildings) {
+                        this[position] = Tile.Buildings;
+                    }
                 }
             }
         }
-
         void InitializeTileTypes() {
             tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
             foreach (var component in GetComponentsInChildren<TileComponent>()) {
@@ -170,9 +147,31 @@ namespace Simple4X
             }
         }
 
-        Tile GetTile(Axial pos) {
-            // TODO: Check bounds
-            return (Tile)tiles[pos.q][pos.r];
+        public bool RaycastMouse(out Axial position) {
+            // TODO: Robustness - use the correct camera at all times
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            return Raycast(ray, out position);
+        }
+
+        public bool Raycast(Ray ray, out Axial position) {
+            Plane horizontalPlane = new Plane(Vector3.up, transform.position);
+
+            float distance = 0.0f;
+            if (horizontalPlane.Raycast(ray, out distance)) {
+                Vector3 hitWorldPosition = ray.origin + ray.direction * distance;
+                Vector3 hitLocalPosition = transform.InverseTransformPoint(hitWorldPosition);
+
+                float q = (Mathf.Sqrt(3.0f) / 3.0f * hitLocalPosition.x - 1.0f / 3.0f * hitLocalPosition.z) / HexSize;
+                float r = (2.0f / 3.0f * hitLocalPosition.z) / HexSize;
+                position = Axial.Round(q, r);
+                return IsWithinBounds(position);
+            }
+            position = new Axial();
+            return false;
+        }
+
+        public bool IsWithinBounds(Axial position) {
+            return position.q >= 0 && position.q < width && position.r >= 0 && position.r < height;
         }
 
         void SetTile(Axial pos, Tile tile) {
@@ -185,6 +184,34 @@ namespace Simple4X
             tileTypes[newID].SetUpTile(this, pos, tileRoots[pos.q][pos.r]);
         }
 
+        public Tile this[int q, int r] {
+            get {
+                return this[new Axial(q, r)];
+            }
+            set {
+                this[new Axial(q, r)] = value;
+            }
+        }
+
+        public Tile this[Axial axial] {
+            get {
+                return (Tile)tiles[axial.q][axial.r];
+            }
+            set {
+                SetTile(axial, value);
+            }
+        }
+
+        public Tile this[Offset offset] {
+            get {
+                var axial = (Axial)offset;
+                return (Tile)tiles[axial.q][axial.r];
+            }
+            set {
+                SetTile((Axial)offset, value);
+            }
+        }
+
         public Vector3 GetBlockCenter(Offset offset)
         {
             float x = offset.col * HexWidth + 0.5f * HexWidth * (offset.row & 1);
@@ -192,8 +219,4 @@ namespace Simple4X
             return new Vector3(x, transform.position.y, z);
         }
     }
-
-    // TileMap
-    //  - GetTile(x, y)
-    //  - SetTile(x, y)
 }
