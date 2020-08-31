@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5261351478110073469}
   - component: {fileID: 3318100616352069472}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Empty
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5338071bc65c44ba29e5472466aa62, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
+  type: 0
 --- !u!1001 &9196233168497563634
 PrefabInstance:
   m_ObjectHideFlags: 0
