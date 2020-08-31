@@ -1,76 +1,125 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace Simple4X {
-    public struct Offset {
+namespace Simple4X
+{
+    // TODO: Move these coordinate structs to separate files
+    public struct Offset
+    {
         public int row;
         public int col;
 
-        public Offset(int row, int col) {
+        public Offset(int row, int col)
+        {
             this.row = row;
             this.col = col;
         }
 
-        public static explicit operator Offset(Axial axial) {
+        public static explicit operator Offset(Axial axial)
+        {
             int row = axial.r;
             int col = axial.q + (axial.r - (axial.r & 1)) / 2;
             return new Offset(row, col);
         }
     }
 
-    public struct Axial {
+    public struct Axial
+    {
         public int q, r;
 
-        public Axial(int q, int r) {
+        public Axial(int q, int r)
+        {
             this.q = q;
             this.r = r;
         }
 
-        public static explicit operator Axial(Offset offset) {
+        public static explicit operator Axial(Offset offset)
+        {
             int q = offset.col - (offset.row - (offset.row & 1)) / 2;
             int r = offset.row;
             return new Axial(q, r);
         }
     }
 
-    public class Grid : MonoBehaviour {
+    // TODO: Rename this to TileMap. Then we can have separate TileMap, InfluenceMap, PopulationMap, etc... classes 
+    public class Grid : MonoBehaviour
+    {
         public const float HexSize = 1.0f;
         public static readonly float HexWidth = Mathf.Sqrt(3) * HexSize;
         public static readonly float HexHeight = 2 * HexSize;
 
-        [SerializeField, Range(1, 512)] int height_ = 128;
-        [SerializeField, Range(1, 512)] int width_ = 128;
-        [SerializeField] GameObject[] tilePrefabs_ = new GameObject[0];
+        [SerializeField, Range(1, 512)] int height = 128;
+        [SerializeField, Range(1, 512)] int width = 128;
 
-        TileComponent[][] tiles_;
+        TileComponent[] tileTypes;
+        int[][] tiles;
+        Transform[][] tileRoots; // GameObjects in the scene
 
-        void Awake() {
-            Debug.AssertFormat(width_ > 0, "Width must be greater that zero, width is currently: {0}", width_);
-            Debug.AssertFormat(height_ > 0, "Height must be greater that zero, height is currently: {0}", height_);
+        void Awake()
+        {
+            Debug.AssertFormat(width > 0, "Width must be greater that zero, width is currently: {0}", width);
+            Debug.AssertFormat(height > 0, "Height must be greater that zero, height is currently: {0}", height);
 
-            tiles_ = new TileComponent[width_][];
-            for (int i = 0; i < height_; ++i) {
-                tiles_[i] = new TileComponent[height_];
+            // Initialize the map
+            // All zeroes for now.
+            tiles = new int[width][];
+            for (int i = 0; i < width; ++i)
+            {
+                tiles[i] = new int[height];
+                for (int j = 0; j < height; ++j) {
+                    tiles[i][j] = 0; // Might be redundant
+                }
             }
 
-            for (int row = 0; row < height_; ++row) {
-                for (int col = 0; col < width_; ++col) {
-                    var center = GetBlockCenter(new Offset(row, col));
-                    var odds = UnityEngine.Random.Range(0.0f, 1.0f);
-                    Instantiate(tilePrefabs_[odds > 0.11f ? 1 : 0], center, Quaternion.identity);
+            tileRoots = new Transform[width][];
+            for (int i = 0; i < width; ++i)
+            {
+                tileRoots[i] = new Transform[height];
+            }
+
+            InitializeTileTypes();
+        }
+
+        void InitializeTileTypes() {
+            tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
+            foreach (var component in GetComponentInChildren<TileComponent>()) {
+                Tile tileType = component.Type;
+                int tileID = (int)tileType;
+                if (tileTypes[tileID] == null) {
+                    tileTypes[tileID] = component;
+                }
+                else {
+                    throw new Exception(String.Format("Tile type {0} is already set.", tileType));
                 }
             }
         }
 
-        public Vector3 GetBlockCenter(Axial axial) {
-            return GetBlockCenter((Offset)axial);
+        Tile GetTile(Axial pos) {
+            // TODO: Check bounds
+            return tiles[pos.q][pos.r];
         }
 
-        public Vector3 GetBlockCenter(Offset offset) {
+        void SetTile(Axial pos, Tile tile) {
+            // TODO: Check bounds
+            var currentType = tiles[pos.q][pos.r];
+            tileTypes[currentType].RemoveTile(this, pos, tileRoots[pos.q][pos.r]);
+
+            var newID = (int)tile;
+            tiles[pos.q][pos.r] = newID;
+            tileTypes[newID].SetUpTile(this, pos, tileRoots[pos.q][pos.r]);
+        }
+
+        public Vector3 GetBlockCenter(Offset offset)
+        {
             float x = offset.col * HexWidth + 0.5f * HexWidth * (offset.row & 1);
             float z = offset.row * HexHeight * 0.75f;
             return new Vector3(x, transform.position.y, z);
         }
     }
+
+    // TileMap
+    //  - GetTile(x, y)
+    //  - SetTile(x, y)
 }
