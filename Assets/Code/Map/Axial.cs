@@ -22,6 +22,32 @@ namespace Simple4X {
             this.r = r;
         }
 
+        public static Axial operator +(Axial lhs, Axial rhs) {
+            return new Axial(lhs.q + rhs.q, lhs.r + rhs.r);
+        }
+
+        public static Axial operator -(Axial lhs, Axial rhs) {
+            return new Axial(lhs.q - rhs.q, lhs.r - rhs.r);
+        }
+
+        public static Axial operator *(float scalar, Axial rhs) {
+            return Axial.Round(rhs.q * scalar, rhs.r * scalar);
+        }
+
+        public static Axial operator *(Axial lhs, float scalar) {
+            return Axial.Round(lhs.q * scalar, lhs.r * scalar);
+        }
+
+        public  static Axial operator /(float scalar, Axial rhs)
+        {
+            return Axial.Round(rhs.q / scalar, rhs.r / scalar);
+        }
+
+        public static Axial operator /(Axial lhs, float scalar)
+        {
+            return Axial.Round(lhs.q / scalar, lhs.r / scalar);
+        }
+
         public static Axial Round(float q, float r) {
             float x = q;
             float z = r;
