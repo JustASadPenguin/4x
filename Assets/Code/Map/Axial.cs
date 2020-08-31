@@ -5,16 +5,16 @@ namespace Simple4X {
         public int q;
         public int r;
 
-        public const Axial Zero = new Axial(0, 0);
+        public static readonly Axial Zero = new Axial(0, 0);
 
-        public const Axial TopLeft = new Axial(0, -1);
-        public const Axial TopRight = new Axial(1, -1);
-        public const Axial Right = new Axial(1, 0);
-        public const Axial BottomRight = new Axial(-1, 0);
-        public const Axial BottomLeft = new Axial(-1, 1);
-        public const Axial Left = new Axial(0, 1);
+        public static readonly Axial TopLeft = new Axial(0, -1);
+        public static readonly Axial TopRight = new Axial(1, -1);
+        public static readonly Axial Right = new Axial(1, 0);
+        public static readonly Axial BottomRight = new Axial(-1, 0);
+        public static readonly Axial BottomLeft = new Axial(-1, 1);
+        public static readonly Axial Left = new Axial(0, 1);
 
-        public const Axial[] Neighbours = {
+        public static readonly Axial[] Neighbours = {
             TopLeft, TopRight, Right, BottomRight, BottomLeft, Left
         };
 
