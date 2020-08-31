@@ -95,11 +95,10 @@ namespace Simple4X
             for (int i = 0; i < width; ++i)
             {
                 tiles[i] = new int[height];
-                for (int j = 0; j < height; ++j) {
-                    tiles[i][j] = 0; // Might be redundant
-                }
             }
 
+            // Initialize tile roots
+            // TODO: Only spawn them as needed...
             tileRoots = new Transform[width][];
             for (int q = 0; q < width; ++q)
             {
@@ -113,8 +112,10 @@ namespace Simple4X
                 }
             }
 
+            // Register tile types
             InitializeTileTypes();
 
+            // Set all tiles to empty
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
                     this[q, r] = Tile.Empty;
@@ -130,6 +131,7 @@ namespace Simple4X
                 }
             }
         }
+
         void InitializeTileTypes() {
             tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
             foreach (var component in GetComponentsInChildren<TileComponent>()) {
