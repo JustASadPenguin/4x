@@ -126,9 +126,7 @@ namespace Simple4X
             if (Input.GetMouseButton(0)) {
                 Axial position;
                 if (RaycastMouse(out position)) {
-                    if (this[position] != Tile.Buildings) {
-                        this[position] = Tile.Buildings;
-                    }
+                    this[position] = Tile.Influence;
                 }
             }
         }
