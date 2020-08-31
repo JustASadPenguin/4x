@@ -134,10 +134,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Influence1
       objectReference: {fileID: 0}
-    - target: {fileID: 3318100616352069472, guid: 6d78cc48a6fd6b943b3dae40a4c9f51b, type: 3}
-      propertyPath: type
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 5261351478110073469, guid: 6d78cc48a6fd6b943b3dae40a4c9f51b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -191,10 +187,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1272161081}
     m_Modifications:
-    - target: {fileID: 22066885120084302, guid: 33e080052c9aa5246960c5e6f1841b87, type: 3}
-      propertyPath: type
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 1646466551143540561, guid: 33e080052c9aa5246960c5e6f1841b87, type: 3}
       propertyPath: m_Name
       value: Buildings

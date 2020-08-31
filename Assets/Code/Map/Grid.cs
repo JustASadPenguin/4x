@@ -118,7 +118,9 @@ namespace Simple4X
             // Set all tiles to empty
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
-                    this[q, r] = Tile.Empty;
+                    var tile = (int)Tile.Empty;
+                    tiles[q][r] = tile;
+                    tileTypes[tile].SetUpTile(this, new Axial(q, r), tileRoots[q][r]);
                 }
             }
         }
@@ -136,6 +138,9 @@ namespace Simple4X
             tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
             foreach (var component in GetComponentsInChildren<TileComponent>()) {
                 Tile tileType = component.Type;
+                if (tileType == Tile.Undefined) {
+                    throw new Exception("TILE TYPE IS UNDEFINED!!! Make sure you add the new tile to Tile.cs and set the TileComponent field in the inspector.");
+                }
                 int tileID = (int)tileType;
                 if (tileTypes[tileID] == null) {
                     Debug.LogFormat("Initialized tile: {0} [ID: {1}]", tileType, tileID);
