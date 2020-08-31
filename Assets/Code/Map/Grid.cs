@@ -1,75 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEditorInternal;
 using UnityEngine;
 
 namespace Simple4X
 {
-    // TODO: Move these coordinate structs to separate files
-    public struct Offset
-    {
-        public int row;
-        public int col;
-
-        public Offset(int row, int col)
-        {
-            this.row = row;
-            this.col = col;
-        }
-
-        public static explicit operator Offset(Axial axial)
-        {
-            int row = axial.r;
-            int col = axial.q + (axial.r - (axial.r & 1)) / 2;
-            return new Offset(row, col);
-        }
-    }
-
-    public struct Axial
-    {
-        public int q, r;
-
-        public Axial(int q, int r)
-        {
-            this.q = q;
-            this.r = r;
-        }
-
-        public static Axial Round(float q, float r) {
-            float x = q;
-            float z = r;
-            float y = -x - z;
-
-            int rx = Mathf.RoundToInt(x);
-            int ry = Mathf.RoundToInt(y);
-            int rz = Mathf.RoundToInt(z);
-
-            float xdiff = Mathf.Abs(rx - x);
-            float ydiff = Mathf.Abs(ry - y);
-            float zdiff = Mathf.Abs(rz - z);
-
-            if (xdiff > ydiff && xdiff > zdiff) {
-                rx = -ry - rz;
-            }
-            else if (ydiff > zdiff) {
-                ry = -rx - rz;
-            }
-            else {
-                rz = -rx - ry;
-            }
-
-            return new Axial(rx, rz);
-        }
-
-        public static explicit operator Axial(Offset offset)
-        {
-            int q = offset.col - (offset.row - (offset.row & 1)) / 2;
-            int r = offset.row;
-            return new Axial(q, r);
-        }
-    }
-
     // TODO: Rename this to TileMap. Then we can have separate TileMap, InfluenceMap, PopulationMap, etc... classes 
     public class Grid : MonoBehaviour
     {
@@ -95,11 +29,10 @@ namespace Simple4X
             for (int i = 0; i < width; ++i)
             {
                 tiles[i] = new int[height];
-                for (int j = 0; j < height; ++j) {
-                    tiles[i][j] = 0; // Might be redundant
-                }
             }
 
+            // Initialize tile roots
+            // TODO: Only spawn them as needed...
             tileRoots = new Transform[width][];
             for (int q = 0; q < width; ++q)
             {
@@ -113,11 +46,15 @@ namespace Simple4X
                 }
             }
 
+            // Register tile types
             InitializeTileTypes();
 
+            // Set all tiles to empty
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
-                    SetTile(new Axial(q, r), Tile.Empty);
+                    var tile = (int)Tile.Empty;
+                    tiles[q][r] = tile;
+                    tileTypes[tile].SetUpTile(this, new Axial(q, r), tileRoots[q][r]);
                 }
             }
         }
@@ -130,10 +67,14 @@ namespace Simple4X
                 }
             }
         }
+
         void InitializeTileTypes() {
             tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
             foreach (var component in GetComponentsInChildren<TileComponent>()) {
                 Tile tileType = component.Type;
+                if (tileType == Tile.Undefined) {
+                    throw new Exception("TILE TYPE IS UNDEFINED!!! Make sure you add the new tile to Tile.cs and set the TileComponent field in the inspector.");
+                }
                 int tileID = (int)tileType;
                 if (tileTypes[tileID] == null) {
                     Debug.LogFormat("Initialized tile: {0} [ID: {1}]", tileType, tileID);
