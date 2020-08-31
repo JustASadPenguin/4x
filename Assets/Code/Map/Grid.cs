@@ -6,29 +6,6 @@ using UnityEngine;
 
 namespace Simple4X
 {
-    // TODO: Move these coordinate structs to separate files
-    public struct Offset
-    {
-        public int row;
-        public int col;
-
-        public Offset(int row, int col)
-        {
-            this.row = row;
-            this.col = col;
-        }
-
-        public static explicit operator Offset(Axial axial)
-        {
-            int row = axial.r;
-            int col = axial.q + (axial.r - (axial.r & 1)) / 2;
-            return new Offset(row, col);
-        }
-    }
-
-    public struct Axial
-    {
-        public int q, r;
     // TODO: Rename this to TileMap. Then we can have separate TileMap, InfluenceMap, PopulationMap, etc... classes 
     public class Grid : MonoBehaviour
     {

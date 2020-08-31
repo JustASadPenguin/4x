@@ -2,6 +2,9 @@
 
 namespace Simple4X {
     public struct Axial {
+        public int q;
+        public int r;
+
         public Axial(int q, int r)
         {
             this.q = q;
