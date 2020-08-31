@@ -49,6 +49,14 @@ namespace Simple4X {
         {
             return Axial.Round(lhs.q / scalar, lhs.r / scalar);
         }
+        
+        public static bool operator ==(Axial lhs, Axial rhs) {
+            return lhs.q == rhs.q && lhs.r == rhs.r;
+        }
+
+        public static bool operator !=(Axial lhs, Axial rhs) {
+            return !(lhs == rhs);
+        }
 
         public static Axial Round(float q, float r) {
             float x = q;
