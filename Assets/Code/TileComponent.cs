@@ -10,6 +10,9 @@ namespace Simple4X {
         }
 
         public virtual void SetUpTile(Grid grid, Axial position, Transform root) {
+            var copy = Instantiate<GameObject>(gameObject);
+            copy.transform.SetParent(root);
+            copy.transform.localPosition = Vector3.zero;
         }
 
         public virtual void RemoveTile(Grid grid, Axial position, Transform root) {

@@ -55,7 +55,7 @@ namespace Simple4X
 
         TileComponent[] tileTypes;
         int[][] tiles;
-        Transform[][] tileRoots; // GameObjects in the scene
+        Transform[][] tileRoots;
 
         void Awake()
         {
@@ -74,20 +74,34 @@ namespace Simple4X
             }
 
             tileRoots = new Transform[width][];
-            for (int i = 0; i < width; ++i)
+            for (int q = 0; q < width; ++q)
             {
-                tileRoots[i] = new Transform[height];
+                tileRoots[q] = new Transform[height];
+                for (int r = 0; r < height; ++r) {
+                    var g = new GameObject();
+                    g.transform.SetParent(transform);
+                    g.transform.localPosition = GetBlockCenter((Offset)new Axial(q, r));
+                    g.name = String.Format("{0}, {1}", q, r);
+                    tileRoots[q][r] = g.transform;
+                }
             }
 
             InitializeTileTypes();
+
+            for (int q = 0; q < width; ++q) {
+                for (int r = 0; r < height; ++r) {
+                    SetTile(new Axial(q, r), Tile.Sphere);
+                }
+            }
         }
 
         void InitializeTileTypes() {
             tileTypes = new TileComponent[Enum.GetValues(typeof(Tile)).Length];
-            foreach (var component in GetComponentInChildren<TileComponent>()) {
+            foreach (var component in GetComponentsInChildren<TileComponent>()) {
                 Tile tileType = component.Type;
                 int tileID = (int)tileType;
                 if (tileTypes[tileID] == null) {
+                    Debug.LogFormat("Initialized tile: {0} [ID: {1}]", tileType, tileID);
                     tileTypes[tileID] = component;
                 }
                 else {
@@ -98,7 +112,7 @@ namespace Simple4X
 
         Tile GetTile(Axial pos) {
             // TODO: Check bounds
-            return tiles[pos.q][pos.r];
+            return (Tile)tiles[pos.q][pos.r];
         }
 
         void SetTile(Axial pos, Tile tile) {
