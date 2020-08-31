@@ -40,11 +40,6 @@ namespace Simple4X {
             return Axial.Round(lhs.q * scalar, lhs.r * scalar);
         }
 
-        public  static Axial operator /(float scalar, Axial rhs)
-        {
-            return Axial.Round(rhs.q / scalar, rhs.r / scalar);
-        }
-
         public static Axial operator /(Axial lhs, float scalar)
         {
             return Axial.Round(lhs.q / scalar, lhs.r / scalar);
