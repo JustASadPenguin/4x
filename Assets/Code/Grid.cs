@@ -35,6 +35,32 @@ namespace Simple4X
             this.r = r;
         }
 
+        public static Axial Round(float q, float r) {
+            float x = q;
+            float z = r;
+            float y = -x - z;
+
+            int rx = Mathf.RoundToInt(x);
+            int ry = Mathf.RoundToInt(y);
+            int rz = Mathf.RoundToInt(z);
+
+            float xdiff = Mathf.Abs(rx - x);
+            float ydiff = Mathf.Abs(ry - y);
+            float zdiff = Mathf.Abs(rz - z);
+
+            if (xdiff > ydiff && xdiff > zdiff) {
+                rx = -ry - rz;
+            }
+            else if (ydiff > zdiff) {
+                ry = -rx - rz;
+            }
+            else {
+                rz = -rx - ry;
+            }
+
+            return new Axial(rx, rz);
+        }
+
         public static explicit operator Axial(Offset offset)
         {
             int q = offset.col - (offset.row - (offset.row & 1)) / 2;
@@ -91,6 +117,40 @@ namespace Simple4X
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
                     SetTile(new Axial(q, r), Tile.Empty);
+                }
+            }
+        }
+
+        private void Update() {
+            if (Input.GetMouseButton(0)) {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Plane horizontalPlane = new Plane(Vector3.up, transform.position);
+
+                float distance = 0.0f;
+                if (horizontalPlane.Raycast(ray, out distance)) {
+                    Vector3 hitWorldPosition = ray.origin + ray.direction * distance;
+                    Vector3 hitLocalPosition = transform.InverseTransformPoint(hitWorldPosition);
+
+                    Debug.DrawRay(hitLocalPosition, Vector3.up, Color.red);
+                }
+            }
+            if (Input.GetMouseButtonDown(0)) {
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+                Plane horizontalPlane = new Plane(Vector3.up, transform.position);
+
+                float distance = 0.0f;
+                if (horizontalPlane.Raycast(ray, out distance)) {
+                    Vector3 hitWorldPosition = ray.origin + ray.direction * distance;
+                    Vector3 hitLocalPosition = transform.InverseTransformPoint(hitWorldPosition);
+
+                    Debug.DrawRay(hitLocalPosition, Vector3.up, Color.red);
+
+                    float q = (Mathf.Sqrt(3.0f) / 3.0f * hitLocalPosition.x - 1.0f / 3.0f * hitLocalPosition.z) / HexSize;
+                    float r = (2.0f / 3.0f * hitLocalPosition.z) / HexSize;
+                    Axial position = Axial.Round(q, r);
+
+                    Tile tile = GetTile(position);
+                    SetTile(position, tile == Tile.Empty ? Tile.Buildings : Tile.Empty);
                 }
             }
         }
