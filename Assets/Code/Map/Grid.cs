@@ -16,6 +16,7 @@ namespace Simple4X
 
         TileComponent[] tileTypes;
         int[][] tiles;
+        public int[][] playerInfluence; // Just the 1 player for now lol. Each company will need a separate grid
         Transform[][] tileRoots;
 
         void Awake()
@@ -29,6 +30,12 @@ namespace Simple4X
             for (int i = 0; i < width; ++i)
             {
                 tiles[i] = new int[height];
+            }
+
+            // TEMP
+            playerInfluence = new int[width][];
+            for (int i = 0; i < width; ++i) {
+                playerInfluence[i] = new int[height];
             }
 
             // Initialize tile roots
@@ -60,10 +67,17 @@ namespace Simple4X
         }
 
         private void Update() {
-            if (Input.GetMouseButton(0)) {
+            if (Input.GetMouseButtonDown(0)) {
                 Axial position;
                 if (RaycastMouse(out position)) {
                     this[position] = Tile.Influence;
+                }
+            }
+
+            for (int q = 0; q < width; ++q) {
+                for (int r = 0; r < height; ++r) {
+                    Vector3 worldPos = transform.TransformPoint(GetBlockCenter((Offset)new Axial(q, r)));
+                    Debug.DrawRay(worldPos, Vector3.up * playerInfluence[q][r], Color.red);
                 }
             }
         }
