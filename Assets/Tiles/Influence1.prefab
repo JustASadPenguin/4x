@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5261351478110073469}
-  - component: {fileID: 3318100616352069472}
+  - component: {fileID: -290926843305417369}
   m_Layer: 0
   m_Name: Influence1
   m_TagString: Untagged
@@ -33,7 +33,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3318100616352069472
+--- !u!114 &-290926843305417369
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,10 +42,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1646466551143540561}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc5338071bc65c44ba29e5472466aa62, type: 3}
+  m_Script: {fileID: 11500000, guid: 136cfe7f6639bb347a556ed102f367c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   type: 3
+  radius: 4
 --- !u!1001 &4677949311686764384
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Simple4X {
     public struct Axial {
@@ -22,6 +23,15 @@ namespace Simple4X {
         {
             this.q = q;
             this.r = r;
+        }
+
+        public Axial[] GetNeighbours() {
+            Axial[] neighbours = new Axial[Neighbours.Length];
+            Array.Copy(Neighbours, neighbours, neighbours.Length);
+            for (int i = 0; i < neighbours.Length; ++i) {
+                neighbours[i] += this;
+            }
+            return neighbours;
         }
 
         public static Axial operator +(Axial lhs, Axial rhs) {
@@ -77,6 +87,12 @@ namespace Simple4X {
             }
 
             return new Axial(rx, rz);
+        }
+
+        public static float Distance(Axial a, Axial b) {
+            int dq = a.q - b.q;
+            int dr = a.r - b.r;
+            return Mathf.Sqrt(dq * dq + dr * dr + dq * dr);
         }
 
         public static explicit operator Axial(Offset offset)
