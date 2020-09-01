@@ -21,5 +21,11 @@ namespace Simple4X {
                 Destroy(root.GetChild(i).gameObject);
             }
         }
+
+        public virtual void InfluenceUpdated(Grid grid, Axial position) {}
+
+        public virtual bool CanBePlaced(Grid grid, Axial position) {
+            return true;
+        }
     }
 }

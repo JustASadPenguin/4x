@@ -16,8 +16,8 @@ namespace Simple4X
 
         TileComponent[] tileTypes;
         int[][] tiles;
-        public int[][] playerInfluence; // Just the 1 player for now lol. Each company will need a separate grid
-        Transform[][] tileRoots;
+        public int[][] TEMPplayerInfluence; // Just the 1 player for now lol. Each company will need a separate grid
+        public Transform[][] tileRoots;
 
         void Awake()
         {
@@ -32,11 +32,6 @@ namespace Simple4X
                 tiles[i] = new int[height];
             }
 
-            // TEMP
-            playerInfluence = new int[width][];
-            for (int i = 0; i < width; ++i) {
-                playerInfluence[i] = new int[height];
-            }
 
             // Initialize tile roots
             // TODO: Only spawn them as needed...
@@ -64,20 +59,39 @@ namespace Simple4X
                     tileTypes[tile].SetUpTile(this, new Axial(q, r), tileRoots[q][r]);
                 }
             }
+
+            // TEMP
+            TEMPplayerInfluence = new int[width][];
+            for (int i = 0; i < width; ++i) {
+                TEMPplayerInfluence[i] = new int[height];
+            }
+            int q_ = UnityEngine.Random.Range(0, width);
+            int r_ = UnityEngine.Random.Range(0, height);
+            tiles[q_][r_] = (int)Tile.Influence;
+            tileTypes[(int)Tile.Influence].SetUpTile(this, new Axial(q_, r_), tileRoots[q_][r_]);
+        }
+
+        public void TEMPAddInfluence(Axial position, int value) {
+            TEMPplayerInfluence[position.q][position.r] += value;
+            var comp = GetTileComponentAt(position);
+            comp.InfluenceUpdated(this, position);
         }
 
         private void Update() {
             if (Input.GetMouseButtonDown(0)) {
                 Axial position;
                 if (RaycastMouse(out position)) {
-                    this[position] = Tile.Influence;
+                    var tile = GetTileComponent(Tile.Influence);
+                    if (tile.CanBePlaced(this, position)) {
+                        this[position] = Tile.Influence;
+                    }
                 }
             }
 
             for (int q = 0; q < width; ++q) {
                 for (int r = 0; r < height; ++r) {
                     Vector3 worldPos = transform.TransformPoint(GetBlockCenter((Offset)new Axial(q, r)));
-                    Debug.DrawRay(worldPos, Vector3.up * playerInfluence[q][r], Color.red);
+                    Debug.DrawRay(worldPos, Vector3.up * TEMPplayerInfluence[q][r], Color.red);
                 }
             }
         }
@@ -121,6 +135,19 @@ namespace Simple4X
             }
             position = new Axial();
             return false;
+        }
+
+        public TileComponent GetTileComponent(Tile tile) {
+            var tileComponent = tileTypes[(int)tile];
+            if (tileComponent == null) {
+                throw new ArgumentException(String.Format("Tile type {0} has not been initialized.", tile));
+            }
+            return tileComponent;
+        }
+
+        public TileComponent GetTileComponentAt(Axial axial) {
+            var tileComponent = tileTypes[tiles[axial.q][axial.r]];
+            return tileComponent;
         }
 
         public bool IsWithinBounds(Axial position) {

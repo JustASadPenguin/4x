@@ -9,6 +9,10 @@ namespace Simple4X
         [SerializeField] int radius = 3;
         [SerializeField] int centerInfluence = 3;
 
+        public override bool CanBePlaced(Grid grid, Axial position) {
+            return grid.TEMPplayerInfluence[position.q][position.r] > 0;
+        }
+
         public override void SetUpTile(Grid grid, Axial position, Transform root)
         {
             base.SetUpTile(grid, position, root);
@@ -28,7 +32,7 @@ namespace Simple4X
                 visited.Add(neighbour);
 
                 if (grid.IsWithinBounds(neighbour)) {
-                    grid.playerInfluence[neighbour.q][neighbour.r] += Mathf.FloorToInt(centerInfluence * (1.0f - Axial.Distance(neighbour, position) / (float)radius));
+                    grid.TEMPAddInfluence(neighbour, Mathf.FloorToInt(centerInfluence * (1.0f - Axial.Distance(neighbour, position) / (float)radius)));
                 }
 
                 foreach(Axial next in neighbour.GetNeighbours()) {
@@ -57,7 +61,7 @@ namespace Simple4X
                 visited.Add(neighbour);
 
                 if (grid.IsWithinBounds(neighbour)) {
-                    grid.playerInfluence[neighbour.q][neighbour.r] -= Mathf.FloorToInt(centerInfluence * (1.0f - Axial.Distance(neighbour, position) / (float)radius));
+                    grid.TEMPAddInfluence(neighbour, -Mathf.FloorToInt(centerInfluence * (1.0f - Axial.Distance(neighbour, position) / (float)radius)));
                 }
 
                 foreach(Axial next in neighbour.GetNeighbours()) {
