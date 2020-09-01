@@ -130,6 +130,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1272161081}
     m_Modifications:
+    - target: {fileID: -290926843305417369, guid: 6d78cc48a6fd6b943b3dae40a4c9f51b, type: 3}
+      propertyPath: radius
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1646466551143540561, guid: 6d78cc48a6fd6b943b3dae40a4c9f51b, type: 3}
       propertyPath: m_Name
       value: Influence1
